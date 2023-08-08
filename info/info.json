@@ -1,0 +1,15 @@
+{
+    "username": "gmn22",
+    "code": "C-MABE-087",
+    "title": "Parallelisation and optimisation of Monte Carlo simulations in computational magnetism",
+    "s1": {
+        "name": "Marijan Beg",
+        "email": "m.beg@imperial.ac.uk",
+        "affiliation": "Department of Earth Science and Engineering, Imperial College London"
+    },
+    "s2": {
+        "name": "Martin Lang",
+        "email": "m.lang@soton.ac.uk",
+        "affiliation": "University of Southampton, UK"
+    }
+}
