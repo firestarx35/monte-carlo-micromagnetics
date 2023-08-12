@@ -1,9 +1,8 @@
-
 import numpy as np
 
+m0 = 4*np.pi*1e-7 # Tm/A
 
 class Energies(object):
-
 
     def zeeman_energy(self):
         if self.zeeman_K is None:
@@ -86,3 +85,4 @@ class Energies(object):
     
     def total_energy(self):
         return self.zeeman_energy() + self.anisotropic_energy() + self.exchange_energy() + self.dmi_energy()
+
