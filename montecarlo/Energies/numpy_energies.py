@@ -92,7 +92,7 @@ def dmi_energy(grid, dmi_D, Dtype, dx, dy, dz):
         # TODO: implement Cnv_xy
         raise NotImplementedError("Cnv_xy is not implemented yet")
 
-    else:    
+    else:
         curl = np.empty_like(grid, dtype='float64')
         curl[..., 0] = (pgrid[1:-1, 2:, 1:-1, 2] - pgrid[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
                                 (pgrid[1:-1, 1:-1, 2:, 1] - pgrid[1:-1, 1:-1, :-2, 1]) / (2 * dz)
@@ -103,9 +103,8 @@ def dmi_energy(grid, dmi_D, Dtype, dx, dy, dz):
         curl[..., 2] = (pgrid[2:, 1:-1, 1:-1, 1] - pgrid[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
                                 (pgrid[1:-1, 2:, 1:-1, 0] - pgrid[1:-1, :-2, 1:-1, 0]) / (2 * dy)
         
-        energy= np.sum(grid*curl, axis=-1) # dot product of m and curl
-    
-    energy = np.sum(dmi_D[1:-1, 1:-1, 1:-1] * energy) * dx * dy * dz
+        energy= np.sum(pgrid[1:-1, 1:-1, 1:-1]*curl, axis=-1) # dot product of m and curl
+        energy = np.sum(dmi_D[1:-1, 1:-1, 1:-1]*energy)*dx*dy*dz # total energy of the system
 
     return energy
 

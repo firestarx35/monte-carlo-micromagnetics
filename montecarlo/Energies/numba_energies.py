@@ -59,7 +59,7 @@ def dmi_Cnvz(grid, dmi_D, dx, dy, dz):
 @njit
 def dmi_TO(grid, dmi_D, dx, dy, dz):
 
-    curl = np.empty_like(self.grid, dtype='float64')
+    curl = np.empty_like(grid, dtype='float64')
     curl[..., 0] = (grid[1:-1, 2:, 1:-1, 2] - grid[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
                             (grid[1:-1, 1:-1, 2:, 1] - grid[1:-1, 1:-1, :-2, 1]) / (2 * dz)
     
@@ -69,9 +69,8 @@ def dmi_TO(grid, dmi_D, dx, dy, dz):
     curl[..., 2] = (grid[2:, 1:-1, 1:-1, 1] - grid[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
                             (grid[1:-1, 2:, 1:-1, 0] - grid[1:-1, :-2, 1:-1, 0]) / (2 * dy)
     
-    energy= np.sum(grid*curl) # dot product of m and curl and summing over all the elements
-    energy = dmi_D*energy*dx*dy*dz # total energy of the system
-
+    energy= np.sum(grid[1:-1, 1:-1, 1:-1]*curl, axis=-1) # dot product of m and curl
+    energy = dmi_D*np.sum(energy)*dx*dy*dz # total energy of the system
 
 @njit
 def numba_total(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotropic_u, dmi_D, Dtype, dx, dy, dz):
@@ -123,8 +122,8 @@ def delta_energy(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotrop
  
         zeeman = -m0 * Ms * np.sum(grid[1:-1, 1:-1, 1:-1]* zeeman_K) * dx * dy * dz
         
-        aniso = np.cross(grid[1:-1, 1:-1, 1:-1], anisotropic_u)
-        aniso = anisotropic_K*np.sum(aniso**2)*dx*dy*dz
+        # aniso = np.cross(grid[1:-1, 1:-1, 1:-1], anisotropic_u)
+        # aniso = anisotropic_K*np.sum(aniso**2)*dx*dy*dz
         
         laplacian_M = (((grid[2:, 1:-1, 1:-1] - 2 * grid[1:-1, 1:-1, 1:-1] + grid[:-2, 1:-1, 1:-1])/dx**2) + \
                         ((grid[1:-1, 2:, 1:-1] - 2 * grid[1:-1, 1:-1, 1:-1] + grid[1:-1, :-2, 1:-1])/dy**2) + \
@@ -150,7 +149,7 @@ def delta_energy(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotrop
 
         dmi = (m_del_mz - mz_div_m) * dx * dy * dz #Total energy of the system
 
-        delta[i] = zeeman + aniso + exchange + dmi
+        delta[i] = zeeman + exchange + dmi #+ aniso
     
     return delta[1] - delta[0]
 
@@ -181,36 +180,52 @@ def delta_energy2(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotro
     for i in prange(spins.shape[0]):
         grid[2, 2, 2] = spins[i]
  
-        zeeman = -m0 * Ms * np.sum(grid[1:-1, 1:-1, 1:-1]* zeeman_K) * dx * dy * dz
+        zeeman = m0 * Ms * np.sum(grid[1:-1, 1:-1, 1:-1]* zeeman_K) * dx * dy * dz
 
         gradM = ((grid[2:, 1:-1, 1:-1] - grid[:-2, 1:-1, 1:-1]) / (2 * dx) +
                 (grid[1:-1, 2:, 1:-1] - grid[1:-1, :-2, 1:-1]) / (2 * dy) +
                 (grid[1:-1, 1:-1, 2:] - grid[1:-1, 1:-1, :-2]) / (2 * dz)
             )          
         exchange = np.sum(gradM**2)
-        exchange = -exchange_A*exchange*dx*dy*dz #total energy of the system
-        
-        curl = np.empty_like(grid[1:-1, 1:-1, 1:-1], dtype='float64')
-        curl[..., 0] = (grid[1:-1, 2:, 1:-1, 2] - grid[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
-                                (grid[1:-1, 1:-1, 2:, 1] - grid[1:-1, 1:-1, :-2, 1]) / (2 * dz)
-        
-        curl[..., 1] = (grid[1:-1, 1:-1, 2:, 0] - grid[1:-1, 1:-1, :-2, 0]) / (2 * dz) - \
-                                (grid[2:, 1:-1, 1:-1, 2] - grid[:-2, 1:-1, 1:-1, 2]) / (2 * dx)
-        
-        curl[..., 2] = (grid[2:, 1:-1, 1:-1, 1] - grid[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
-                                (grid[1:-1, 2:, 1:-1, 0] - grid[1:-1, :-2, 1:-1, 0]) / (2 * dy)
-        
-        dmi = np.sum(dmi_D*grid*curl) # dot product of m and curl and summing over all the elements
-       
-        dmi = dmi*dx*dy*dz # total energy of the system
+        exchange = - exchange_A*exchange*dx*dy*dz #total energy of the system
 
-        delta[i] = zeeman + exchange + dmi
+        gradM_z = np.empty_like(grid[1:-1,1:-1, 1:-1], dtype='float64')
+        gradM_z[..., 0] = (grid[2:, 1:-1, 1:-1, 2] - grid[:-2, 1:-1, 1:-1, 2]) / (2 * dx)
+        gradM_z[..., 1] = (grid[1:-1, 2:, 1:-1, 2] - grid[1:-1, :-2, 1:-1, 2]) / (2 * dy)
+        gradM_z[..., 2] = (grid[1:-1, 1:-1, 2:, 2] - grid[1:-1, 1:-1, :-2, 2]) / (2 * dz)
+
+        #divergence of m vector
+        div_M = ((grid[2:, 1:-1, 1:-1, 0] - grid[:-2, 1:-1, 1:-1, 0]) / (2 * dx) +
+                (grid[1:-1, 2:, 1:-1, 1] - grid[1:-1, :-2, 1:-1, 1]) / (2 * dy) +
+                (grid[1:-1, 1:-1, 2:, 2] - grid[1:-1, 1:-1, :-2, 2]) / (2 * dz)
+                )
+        #dot product of m and gradient of z component of m vector
+        m_del_mz = np.sum(-dmi_D*grid[1:-1, 1:-1, 1:-1]*gradM_z) 
+        mz_div_m = np.sum(-dmi_D*grid[1:-1, 1:-1, 1:-1, 2]*div_M)  # mz∇⋅m
+
+        dmi = (m_del_mz - mz_div_m) * dx * dy * dz #Total energy of the system
+        
+        # curl = np.empty_like(grid[1:-1, 1:-1, 1:-1], dtype='float64')
+        # curl[..., 0] = (grid[1:-1, 2:, 1:-1, 2] - grid[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
+        #                         (grid[1:-1, 1:-1, 2:, 1] - grid[1:-1, 1:-1, :-2, 1]) / (2 * dz)
+        
+        # curl[..., 1] = (grid[1:-1, 1:-1, 2:, 0] - grid[1:-1, 1:-1, :-2, 0]) / (2 * dz) - \
+        #                         (grid[2:, 1:-1, 1:-1, 2] - grid[:-2, 1:-1, 1:-1, 2]) / (2 * dx)
+        
+        # curl[..., 2] = (grid[2:, 1:-1, 1:-1, 1] - grid[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
+        #                         (grid[1:-1, 2:, 1:-1, 0] - grid[1:-1, :-2, 1:-1, 0]) / (2 * dy)
+        
+        # dmi = np.sum(grid[1:-1, 1:-1, 1:-1]*curl, axis=-1) # dot product of m and curl and summing over all the elements
+       
+        # dmi = np.sum(dmi_D * dmi) * dx * dy * dz #Total energy of the system
+
+        delta[i] =  exchange + dmi + zeeman
     
     return delta[1] - delta[0]
 
 
 @njit
-def delta_energy3(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotropic_u, dmi_D, dx, dy, dz):
+def delta_energy3(grid_ex, grid_dmi, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotropic_u, dmi_D, dx, dy, dz):
     """ Calculate the energy difference between the current state and the proposed state. Uses 'T or O' point group for DMI energy calculation.
         Bloch Point
     Args:
@@ -229,29 +244,33 @@ def delta_energy3(grid, spins, Ms, zeeman_K, exchange_A, anisotropic_K, anisotro
     delta = np.array([0,0], dtype='float64')
 
     for i in prange(spins.shape[0]):
-        grid[2, 2, 2] = spins[i]
+        grid_ex[2, 2, 2] = spins[i]
+        grid_dmi[2, 2, 2] = spins[i]
 
-        gradM = ((grid[2:, 1:-1, 1:-1] - grid[:-2, 1:-1, 1:-1]) / (2 * dx) +
-                (grid[1:-1, 2:, 1:-1] - grid[1:-1, :-2, 1:-1]) / (2 * dy) +
-                (grid[1:-1, 1:-1, 2:] - grid[1:-1, 1:-1, :-2]) / (2 * dz)
-            )          
-        exchange = np.sum(gradM**2)
+        zeeman = - m0 * Ms * np.sum(grid_dmi[1:-1, 1:-1, 1:-1]* zeeman_K) * dx * dy * dz
+
+        laplacian_M = (((grid_ex[2:, 1:-1, 1:-1] - 2 * grid_ex[1:-1, 1:-1, 1:-1] + grid_ex[:-2, 1:-1, 1:-1])/dx**2) + \
+                        ((grid_ex[1:-1, 2:, 1:-1] - 2 * grid_ex[1:-1, 1:-1, 1:-1] + grid_ex[1:-1, :-2, 1:-1])/dy**2) + \
+                        ((grid_ex[1:-1, 1:-1, 2:] - 2 * grid_ex[1:-1, 1:-1, 1:-1] + grid_ex[1:-1, 1:-1, :-2])/dz**2)
+                    )
+        #dot product of m and laplacian_M               
+        exchange = np.sum(grid_ex[1:-1, 1:-1, 1:-1]*laplacian_M) 
         exchange = -exchange_A*exchange*dx*dy*dz #total energy of the system
         
-        curl = np.empty_like(grid[1:-1, 1:-1, 1:-1], dtype='float64')
-        curl[..., 0] = (grid[1:-1, 2:, 1:-1, 2] - grid[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
-                                (grid[1:-1, 1:-1, 2:, 1] - grid[1:-1, 1:-1, :-2, 1]) / (2 * dz)
+        curl = np.empty_like(grid_dmi[1:-1, 1:-1, 1:-1], dtype='float64')
+        curl[..., 0] = (grid_dmi[1:-1, 2:, 1:-1, 2] - grid_dmi[1:-1, :-2, 1:-1, 2]) / (2 * dy) - \
+                                (grid_dmi[1:-1, 1:-1, 2:, 1] - grid_dmi[1:-1, 1:-1, :-2, 1]) / (2 * dz)
         
-        curl[..., 1] = (grid[1:-1, 1:-1, 2:, 0] - grid[1:-1, 1:-1, :-2, 0]) / (2 * dz) - \
-                                (grid[2:, 1:-1, 1:-1, 2] - grid[:-2, 1:-1, 1:-1, 2]) / (2 * dx)
+        curl[..., 1] = (grid_dmi[1:-1, 1:-1, 2:, 0] - grid_dmi[1:-1, 1:-1, :-2, 0]) / (2 * dz) - \
+                                (grid_dmi[2:, 1:-1, 1:-1, 2] - grid_dmi[:-2, 1:-1, 1:-1, 2]) / (2 * dx)
         
-        curl[..., 2] = (grid[2:, 1:-1, 1:-1, 1] - grid[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
-                                (grid[1:-1, 2:, 1:-1, 0] - grid[1:-1, :-2, 1:-1, 0]) / (2 * dy)
+        curl[..., 2] = (grid_dmi[2:, 1:-1, 1:-1, 1] - grid_dmi[:-2, 1:-1, 1:-1, 1]) / (2 * dx) - \
+                                (grid_dmi[1:-1, 2:, 1:-1, 0] - grid_dmi[1:-1, :-2, 1:-1, 0]) / (2 * dy)
         
-        dmi = np.sum(grid[1:-1, 1:-1, 1:-1]*curl, axis=-1) # dot product of m and curl and summing over all the elements
+        dmi = np.sum(grid_dmi[1:-1, 1:-1, 1:-1]*curl, axis=-1) # dot product of m and curl and summing over all the elements
        
         dmi = np.sum(dmi_D * dmi) * dx * dy * dz
 
-        delta[i] = exchange + dmi
+        delta[i] = exchange + dmi + zeeman
     
     return delta[1] - delta[0]
