@@ -1,7 +1,6 @@
-# Nanomagmetic Monte Carlo Simulation
+# Nanomagmetic Monte Carlo Driver
 
-This is micromagnetics model for monte carlo simulations in nanomagnetism. This was developed to be used with Ubermag. Ubermag is a collection of several independent Python packages that can be used independently as well as in combination. The whole set of packages – the ubermag meta-package – is tailored to micromagnetic simulations. The individual sub-packages can be used in other fields, e.g. fluid dynamics.
-The Ubermag has several energy minimisation drivers but this package allows for simulation to be done in non-perturbative manner.
+This is developed for micromagnetics model for monte carlo simulations. This was developed as an extension of Ubermag, a micromagnetic simulations package. Ubermag ![Ubermag](https://ubermag.github.io/index.html) is a collection of several independent Python packages that can be used independently as well as in combination. Ubermag has several energy minimisation drivers but this package allows simulation to be done using non-perturbative approach.
 
 
 ![Project Structure](images/project%20structure.png)
