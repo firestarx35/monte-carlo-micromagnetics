@@ -3,7 +3,7 @@ import numpy as np
 from numba import njit, prange
 from tqdm import tqdm
 from mcpy.energies.numpy_energies import numpy_delta
-
+# from mcpy.system import Grid
 
 """This module contains the main functions for implementing the Metropolis-Hastings Monte Carlo simulations. 
 By changing the spin each iteartion by random angle with uniform distribution."""
@@ -13,14 +13,14 @@ By changing the spin each iteartion by random angle with uniform distribution.""
 K_B = 1.38064852e-23  # Boltzmann constant
 
 
-def driver_numpy(N, grid, zeeman_H, temperature):
+def driver_numpy(N: int, grid, zeeman_H: np.ndarray, temperature: np.float64) -> np.ndarray:
     """ Monte Carlo driver function for Numpy implementation
 
-    Args: 
+    Args:
         N (int): Number of Monte Carlo steps
-        grid (Grid): mcpy.Grid object
+        grid (mcpy.system.Grid): Grid object
         zeeman_H (np.ndarray): Zeeman field
-        temperature (float): Temperature in Kelvin
+        temperature (np.float64): Temperature in Kelvin
 
     Returns:
         grid (np.ndarray): Relaxed system
@@ -97,24 +97,26 @@ def driver_numpy(N, grid, zeeman_H, temperature):
 
 
 @njit(fastmath=True)
-def driver_numba(N, grid, energy_func, zeeman_H, anisotropy_K, anisotropy_u, exchange_A, dmi_D, Dtype, Ms, dx, dy, dz, temperature):
+def driver_numba(N: int, grid: np.ndarray, energy_func, zeeman_H: np.ndarray, anisotropy_K: np.float64,
+                 anisotropy_u: np.ndarray, exchange_A: np.float64, dmi_D: np.ndarray, Dtype: str, Ms: np.float64,
+                 dx: np.float64, dy: np.float64, dz: np.float64, temperature: np.float64) -> np.ndarray:
     """ Monte Carlo driver function for Numba implementation
 
-    Args: 
+    Args:
         N (int): Number of Monte Carlo steps
-        grid (np.ndarray): 3D array of spins
-        energy_func (function): Energy function to be used
+        grid (np.ndarray): 3D array of spins(vector field)
+        energy_func (function): Energy function
         zeeman_H (np.ndarray): Zeeman field
-        anisotropy_K (np.ndarray): Anisotropy constant
+        anisotropy_K (np.float64): Anisotropy constant
         anisotropy_u (np.ndarray): Anisotropy axis
-        exchange_A (np.ndarray): Exchange constant
-        dmi_D (np.ndarray): Dzyaloshinskii-Moriya constant
-        Dtype (np.dtype): DMI type or Crystal class
-        Ms (float): Saturation magnetisation
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
-        temperature (float): Temperature in Kelvin
+        exchange_A (np.float64): Exchange constant
+        dmi_D (np.ndarray): DMI constant
+        Dtype (str): DMI crystal class
+        Ms (np.float64): Saturation magnetisation
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
+        temperature (np.float64): Temperature in Kelvin
 
     Returns:
         grid (np.ndarray): Relaxed system
@@ -191,21 +193,29 @@ def driver_numba(N, grid, energy_func, zeeman_H, anisotropy_K, anisotropy_u, exc
 
 
 @njit(fastmath=True)
-def random_spin_uniform(v, alpha):
-    # Sample the cosine of the polar angle uniformly
+def random_spin_uniform(v: np.ndarray, alpha: np.float64) -> np.ndarray:
+    """Generates a random spin vector with uniform distribution
+
+    Args:
+        v (np.ndarray): Vector
+        alpha (np.float64): Angle
+
+    Returns:
+        v_proposal (np.ndarray): Random spin vector
+    """
+
+    # cos of the polar angle
     cos_del0 = np.random.uniform(np.cos(alpha), 1)
     del_phi = np.random.uniform(0, 2 * np.pi)
 
-    # Derive the polar angle from its cosine value
-    del0 = np.arccos(cos_del0)
+    del0 = np.arccos(cos_del0)  # polar angle
     dx = np.sin(del0) * np.cos(del_phi)
     dy = np.sin(del0) * np.sin(del_phi)
     dz = np.cos(del0)
 
-    # Combine the unit vector with the original vector
     v_proposal = v + np.array([dx, dy, dz])
 
-    # Normalising
+    # normalise
     v_proposal = v_proposal / np.sqrt(np.sum(v_proposal ** 2))
 
     return v_proposal

@@ -1,0 +1,3 @@
+Disc exchang energy in numpy only. And correct it in enery_validation.ipynb
+Testing new spin.\
+Check if host PC has Numba installed if not then revert back to numpy

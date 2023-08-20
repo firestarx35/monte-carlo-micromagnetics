@@ -185,7 +185,7 @@ class MCDriver:
     def _save_state(self, step: int) -> None:
         """Saves the state/plot of the system. Based on direction flags provided in MCDriver.driver() function,
             the state is saved in the specified planes. The state is saved in a file with the following format:
-            S_{step}_T_{temperature}_F_{field}.png
+            S_{step}_T_{temperature}_F_{field}_{direction}.png
 
         Args:
             step (int): The step number.
@@ -208,8 +208,8 @@ class MCDriver:
 class Grid:
     def __init__(self, system: mm.System) -> None:
         """Grid object required by mcpy for micromagnetic simulations. This class contains all the parameters used by the MCDriver.  
-        Created by abstracting and converting the required parameters from a micromagneticmodel.System object. This normalises the grid and creates the DMI array based on regions.
-        and converts other parameters to numpy arrays.
+           Created by abstracting and converting the required parameters from a micromagneticmodel.System object. This normalises 
+           the grid and creates the DMI array based on regions and converts other parameters to numpy arrays.
 
         Args:
             system (micromagneticmodel.System): The system to be initialized.
@@ -352,6 +352,12 @@ class Grid:
         except AttributeError:
             print('Anisotropy not found.')
             return None, None
+
+    def emergent_field(self) -> np.ndarray:
+        pass
+
+    def topological_charge(self, method: str = 'luis') -> float:
+        pass
 
     def zeeman_energy(self) -> float:
         """Computes the Zeeman energy
