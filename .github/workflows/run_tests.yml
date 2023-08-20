@@ -1,0 +1,30 @@
+name: Run Tests with Conda
+
+on:
+  push:
+    branches:
+      - temp
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Setup Conda
+      run: |
+        echo "deb [arch=amd64,arm64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" | sudo tee /etc/apt/sources.list.d/conda.list
+        curl -L https://repo.anaconda.com/pkgs/misc/gpgkeys/conda-archive.asc | sudo apt-key add -
+        sudo apt update
+        sudo apt install conda
+
+    - name: Create and Activate Conda Environment
+      run: |
+        conda env create -f environment.yml
+        echo "source activate irp" >> ~/.bashrc
+        source ~/.bashrc
+
+    - name: Run tests
+      shell: bash -l {0}
+      run: python -m unittest tests_complete.py
