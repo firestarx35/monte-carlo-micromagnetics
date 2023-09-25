@@ -115,7 +115,7 @@ system.m.plane('x').mpl()
 ```python
 
 # Optinal argument for annealing schedule
-schedule = schedule={'type': 'FC', 'start_temp': 60, 'end_temp': 0.001, 'steps': 20}
+schedule={'type': 'FC', 'start_temp': 60, 'end_temp': 0.001, 'steps': 20}
 
 # Defining Monte Carlo driver object
 mc = MCDriver(system, schedule_name='bloch_point', schedule=schedule)
