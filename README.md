@@ -1,26 +1,40 @@
 # McPy - A Micromagnetic Monte Carlo Simulation package
 
-This has been developed as part of my Master's thesis "Monte Carlo Simulations: Probing the Thermal Stability of Bloch Points" to develop a monte carlo driver to be used as an extension of [Ubermag](https://ubermag.github.io/index.html), a micromagnetic simulations package. Ubermag is a collection of several independent Python packages that can be used independently as well as in combination to be used for other physics simulations such as Fluid Dynamics.
+## Overview
+McPy is a specialized package designed for conducting Monte Carlo (Metropolis-Hastings) simulations in micromagnetics for studying magnetic quasiparticles. This has been developed as part of my Master's thesis to study the thermal stability of Bloch Points, a magnetic quasiparticle pivotal for modern data storage solutions. The package has been developed to allow non-zero temperature simulations in micromagnetics using Metropolis-Hastings.
 
-McPy is a package developed for monte carlo simulations in micromagnetics to study magnetic pseudoparticles. The primary aim is to study the thermal stability of bloch points to access their feasibility for information storage. Ubermag already contains well maintained energy minimisation solvers but the goal of this package is to extend the capabilities of Ubermag by adding a non-pertubative approach to energy minimisation that has not been implemented till now.
+## Integration with Ubermag
+McPy seamlessly integrates as an extension of [Ubermag](https://ubermag.github.io/index.html), an established micromagnetic simulation framework. Ubermag encompasses a suite of independent Python packages suitable for diverse physics simulations, including Computational Fluid Dynamics. While Ubermag already contains well-maintained energy minimisation solvers, the goal of McPy is to extend the capabilities of Ubermag by adding a non-perturbative approach to energy minimisation that has not been implemented till now.
 
-#### Why Monte Carlo in micromagnetics?
+## Key Features
 
-Here are several papers validating the effectiveness of monte carlo in this field
+- **Developed in Python:** Simulation conditions can be easily modified and run using Jupyter Notebook.
+- **Numba Accelerated:** Utilizes the Numba "Just-in-time" compiler for performance comparable to C.
+- **3D Finite Difference Micromagnetic Model:** Enables continuous magnetization.
+- **Comprehensive Energy Calculations:** Supports:
+  - Zeeman energy
+  - Uniaxial anisotropy energy
+  - Exchange energy
+  - Dzyaloshinskii-Moriya (DMI) energy
+
+
+### Why Monte Carlo in micromagnetics?
+
+Here are several papers validating the effectiveness of Monte Carlo in this field
  - [Simulating anti-skyrmions on a lattice](https://www.nature.com/articles/s41598-022-22043-0)
- - [The skyrmion lattice phase in three dimensional chiral magnets from Monte Carlo simulations](https://arxiv.org/abs/1304.6580)
+ - [The skyrmion lattice phase in three-dimensional chiral magnets from Monte Carlo simulations](https://arxiv.org/abs/1304.6580)
 
 
 ## Installation:
 
 ### Requirements
         - Python==3.10.11
-        - Ubermag with default oommfc driver : Follow the installation guide at [Ubermag Installation](https://ubermag.github.io/installation.html)
+        - Ubermag with default oommfc driver: Follow the installation guide at [Ubermag Installation](https://ubermag.github.io/installation.html)
         - NumPy==1.24.3
         - Numba==0.57.0
         - cupy-cuda12x==12.1.0
 
-Installation of above packages can be achieved by running the following command
+Installation of the above packages can be achieved by running the following command
 
 ```bash 
 
@@ -30,7 +44,9 @@ conda env create -f environment.yml
 
 ## Usage:
 
-#### Visualising a magnetic singularity- Bloch Point
+#### Visualising a magnetic singularity - Bloch Point
+
+The following example is from [Stable and Manuplable Bloch Point](https://www.nature.com/articles/s41598-019-44462-2). This paper produced results using the Landau–Lifshitz–Gilbert (LLG) equation at absolute zero using a finite element solver. However, we will recreate the results using finite difference Monte Carlo at elevated temperatures.
 
 1. Importing Packages
 
@@ -85,32 +101,35 @@ system.m = df.Field(mesh, dim=3, value=(0, 0, 1), norm=Ms_fun)
 
 ```
 
-4. Visualing the system
+4. Visualising the system
 
 ```python
-
+system.m.plane('z').mpl()
 system.m.plane('x').mpl()
 ```
-![Bi-layer disk](images/bilayer.png)
+![Saturated disk Z](images/uniform_state_z.png)
+![Saturated disk X](images/uniform_state_x.png)
 
 5. Monte Carlo Simulation
 
 ```python
 
-# optinal argument for annealing schedule
+# Optinal argument for annealing schedule
 schedule = schedule={'type': 'FC', 'start_temp': 60, 'end_temp': 0.001, 'steps': 20}
 
-# Defining monte carlo driver object
+# Defining Monte Carlo driver object
 mc = MCDriver(system, schedule_name='bloch_point', schedule=schedule)
 
 # 10 million Monte Carlo iterations
 mc.drive(N=10000000)
 
 # Visualising the system
+system.m.plane('z').mpl()
 system.m.plane('x').mpl()
 
 ```
-![Bloch point](images/bloch_point.png)
+![Bloch point Z](images/bloch_point_z.png)
+![Bloch point X](images/bloch_point_x.png)
 
 
 
@@ -141,7 +160,6 @@ python -m unittest tests.py
      - `Curie_temperature.ipynb`: Curie temperature calculations
      - `bloch_point.ipynb`: Bloch point simulation
    
-<!-- ![Project Structure](images/project%20structure.png) -->
 
 ## Documentation
 You can find the documentation at `docs/html/index.html`. 
