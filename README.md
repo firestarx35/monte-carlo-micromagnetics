@@ -123,9 +123,12 @@ mc = MCDriver(system, schedule_name='bloch_point', schedule=schedule)
 # 10 million Monte Carlo iterations
 mc.drive(N=10000000)
 
-# Visualising the system
+# Visualising the Bloch Point
+
 system.m.plane('z').mpl()
 system.m.plane('x').mpl()
+
+# We can observe a "Head-to-Head" Bloch point at the middle of the disk 
 
 ```
 ![Bloch point Z](images/bloch_point_z.png)
@@ -142,10 +145,6 @@ To run the automated tests
 python -m unittest tests.py
 
 ```
-
-'''
-
-## Guide:
 
 ## Repository structure
 - `mcpy`: The folder containing the main package
