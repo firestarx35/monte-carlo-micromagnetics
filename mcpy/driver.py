@@ -1,26 +1,25 @@
 
+"""This module contains the main functions for implementing the Metropolis-Hastings Monte Carlo simulations. 
+By changing the spin each iteartion by random angle with uniform distribution."""
+
 import numpy as np
 from numba import njit, prange
 from tqdm import tqdm
 from mcpy.energies.numpy_energies import numpy_delta
-
-
-"""This module contains the main functions for implementing the Metropolis-Hastings Monte Carlo simulations. 
-By changing the spin each iteartion by random angle with uniform distribution."""
 
 # Global constants
 
 K_B = 1.38064852e-23  # Boltzmann constant
 
 
-def driver_numpy(N, grid, zeeman_H, temperature):
+def driver_numpy(N: int, grid, zeeman_H: np.ndarray, temperature: np.float64) -> np.ndarray:
     """ Monte Carlo driver function for Numpy implementation
 
-    Args: 
+    Args:
         N (int): Number of Monte Carlo steps
-        grid (Grid): mcpy.Grid object
+        grid (mcpy.system.Grid): Grid object
         zeeman_H (np.ndarray): Zeeman field
-        temperature (float): Temperature in Kelvin
+        temperature (np.float64): Temperature in Kelvin
 
     Returns:
         grid (np.ndarray): Relaxed system
@@ -28,6 +27,9 @@ def driver_numpy(N, grid, zeeman_H, temperature):
     spins = np.zeros(
         (2, 3), dtype='float64')  # array to store original and proposed spin
     shape = grid.grid.shape
+
+    if grid.dmi_D is None:
+        D = None
 
     for _ in tqdm(range(N)):
         # 1. Randomly select a cell
@@ -68,16 +70,19 @@ def driver_numpy(N, grid, zeeman_H, temperature):
                                                                      min(max(z, 0), shape[2]-1)]
                             grid_dmi[i + 2, j + 2, k + 2] = np.zeros(3)
 
-        # DMI constants (3x3x3) for the segmented 5x5x5 grid.
-        D = grid.dmi_D[cell_x:cell_x+3, cell_y:cell_y+3, cell_z:cell_z+3]
+        if grid.dmi_D is not None:
+            # DMI constants (3x3x3) for the segmented 5x5x5 grid.
+            D = grid.dmi_D[cell_x:cell_x+3, cell_y:cell_y+3, cell_z:cell_z+3]
 
         # 2. Original spin
         spins[0] = grid_ex[2, 2, 2]
 
         # 3. Proposal spin
-        direction = grid_ex[2, 2, 2] + np.random.uniform(-0.2, 0.2, size=3)
+        direction = grid_ex[2, 2, 2] + np.random.normal(0, 0.06, size=3)
         magnitude = np.sqrt(np.sum(direction**2))
         direction /= magnitude
+
+        # direction = euler_rotate(grid_ex[2, 2, 2], 3.14)
         spins[1] = direction
 
         # 4. Change in energy
@@ -97,30 +102,35 @@ def driver_numpy(N, grid, zeeman_H, temperature):
 
 
 @njit(fastmath=True)
-def driver_numba(N, grid, energy_func, zeeman_H, anisotropy_K, anisotropy_u, exchange_A, dmi_D, Dtype, Ms, dx, dy, dz, temperature):
+def driver_numba(N: int, grid: np.ndarray, energy_func, zeeman_H: np.ndarray, anisotropy_K: np.float64,
+                 anisotropy_u: np.ndarray, exchange_A: np.float64, dmi_D: np.ndarray, Dtype: str, Ms: np.float64,
+                 dx: np.float64, dy: np.float64, dz: np.float64, temperature: np.float64) -> np.ndarray:
     """ Monte Carlo driver function for Numba implementation
 
-    Args: 
+    Args:
         N (int): Number of Monte Carlo steps
-        grid (np.ndarray): 3D array of spins
-        energy_func (function): Energy function to be used
+        grid (np.ndarray): 3D array of spins(vector field)
+        energy_func (function): Energy function
         zeeman_H (np.ndarray): Zeeman field
-        anisotropy_K (np.ndarray): Anisotropy constant
+        anisotropy_K (np.float64): Anisotropy constant
         anisotropy_u (np.ndarray): Anisotropy axis
-        exchange_A (np.ndarray): Exchange constant
-        dmi_D (np.ndarray): Dzyaloshinskii-Moriya constant
-        Dtype (np.dtype): DMI type or Crystal class
-        Ms (float): Saturation magnetisation
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
-        temperature (float): Temperature in Kelvin
+        exchange_A (np.float64): Exchange constant
+        dmi_D (np.ndarray): DMI constant
+        Dtype (str): DMI crystal class
+        Ms (np.float64): Saturation magnetisation
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
+        temperature (np.float64): Temperature in Kelvin
 
     Returns:
         grid (np.ndarray): Relaxed system
     """
     spins = np.zeros(
         (2, 3), dtype='float64')  # array to store the spin and the proposed spin
+
+    if dmi_D is None:
+        D = None
 
     for _ in prange(N):
         # 1. Randomly select a cell
@@ -163,14 +173,16 @@ def driver_numba(N, grid, energy_func, zeeman_H, anisotropy_K, anisotropy_u, exc
                                                                 min(max(z, 0), grid.shape[2]-1)]
                             grid_dmi[i + 2, j + 2, k + 2] = np.zeros(3)
         # DMI constant for the segmented 5x5x5 grid
-        D = dmi_D[cell_x:cell_x+3, cell_y:cell_y+3, cell_z:cell_z+3]
+        if dmi_D is not None:
+            D = dmi_D[cell_x:cell_x+3, cell_y:cell_y+3, cell_z:cell_z+3]
 
         # 2. Original spin
         spins[0] = grid_ex[2, 2, 2]
         # 3. Proposal spin
-        direction = grid_ex[2, 2, 2] + np.random.uniform(-0.2, 0.2, size=3)
+        direction = grid_ex[2, 2, 2] + np.random.normal(0, 0.06, size=3)
         magnitude = np.sqrt(np.sum(direction**2))
         direction = direction/magnitude
+        # direction = euler_rotate(grid_ex[2, 2, 2], 1.6)
         spins[1] = direction
 
         # 4. Change in energy
@@ -191,21 +203,40 @@ def driver_numba(N, grid, energy_func, zeeman_H, anisotropy_K, anisotropy_u, exc
 
 
 @njit(fastmath=True)
-def random_spin_uniform(v, alpha):
-    # Sample the cosine of the polar angle uniformly
-    cos_del0 = np.random.uniform(np.cos(alpha), 1)
-    del_phi = np.random.uniform(0, 2 * np.pi)
+def euler_rotate(vector, alpha):
+    """
+    Rotate a given vector using Euler angles to achieve uniform angular deviation.
+    This optimized version combines the operations of the previous four functions.
+    """
 
-    # Derive the polar angle from its cosine value
-    del0 = np.arccos(cos_del0)
-    dx = np.sin(del0) * np.cos(del_phi)
-    dy = np.sin(del0) * np.sin(del_phi)
-    dz = np.cos(del0)
+    # Generate zΔ and φΔ for uniform deviation
+    theta = np.random.uniform(0, alpha)
+    z_delta = np.cos(theta)
+    phi_delta = np.random.uniform(0, 2*np.pi)
 
-    # Combine the unit vector with the original vector
-    v_proposal = v + np.array([dx, dy, dz])
+    # Compute the rotated vector [xΔ, yΔ, zΔ] directly
+    sin_arccos_z_delta = np.sin(np.arccos(z_delta))
+    x_delta = sin_arccos_z_delta * np.cos(phi_delta)
+    y_delta = sin_arccos_z_delta * np.sin(phi_delta)
 
-    # Normalising
-    v_proposal = v_proposal / np.sqrt(np.sum(v_proposal ** 2))
+    # Compute the spherical coordinates of the input vector
+    x, y, z = vector
+    theta_i = np.arccos(z)
+    phi_i = np.arctan2(y, x)
 
-    return v_proposal
+    # Compute the rotation matrices and combine them directly
+    cos_phi_i = np.cos(phi_i)
+    sin_phi_i = np.sin(phi_i)
+    cos_theta_i = np.cos(theta_i)
+    sin_theta_i = np.sin(theta_i)
+
+    Rz_Ry = np.array([
+        [cos_phi_i * cos_theta_i, -sin_phi_i, cos_phi_i * sin_theta_i],
+        [sin_phi_i * cos_theta_i, cos_phi_i, sin_phi_i * sin_theta_i],
+        [-sin_theta_i, 0, cos_theta_i]
+    ])
+
+    # Apply the combined rotation
+    rotated_vector = np.dot(Rz_Ry, np.array([x_delta, y_delta, z_delta]))
+
+    return rotated_vector

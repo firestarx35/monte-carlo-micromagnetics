@@ -1,12 +1,14 @@
+"""This module contains the Grid and MCDriver classes required for micromagnetic monte carlo simulations."""
+
+
 import numpy as np
 import micromagneticmodel as mm
+import discretisedfield as df
 from mcpy.energies.numpy_energies import zeeman_energy, anisotropy_energy, exchange_energy, dmi_energy, numpy_delta
 from mcpy.driver import driver_numpy, driver_numba
 from mcpy.energies.numba_energies import numba_delta, delta_energy, delta_energy2
 import os
 
-
-"""This module contains the Grid and MCDriver classes required for micromagnetic monte carlo simulations."""
 
 
 class MCDriver:
@@ -52,9 +54,9 @@ class MCDriver:
         self.schedule = schedule
         self.energy_calc = energy_calc  # if energy_calculator == '1' else delta_energy2
 
-        self._initialize_schedule(schedule)
+        self._initialise_schedule(schedule)
 
-    def _initialize_schedule(self, schedule: dict) -> None:
+    def _initialise_schedule(self, schedule: dict) -> None:
         """Initializes the scheduling parameters based on the provided schedule.
 
         Args:
@@ -76,7 +78,7 @@ class MCDriver:
             self.field = getattr(self.grid, 'zeeman_H')
         else:
             self.field = np.array([0.0, 0.0, 0.0])
-        self.steps = 0
+        self.steps = 1
         self.dt = 0.0
         self.df = np.array([0.0, 0.0, 0.0])
 
@@ -100,8 +102,18 @@ class MCDriver:
         self.steps = schedule['steps']
         self.dt = (self.end_temp - self.temperature) / self.steps
 
+        if self.schedule_type not in ['FC', 'ZFC', 'HFC']:
+            raise KeyError(
+                'Schedule type must be one of the following: FC, ZFC, HFC.')
+
         if self.schedule_type == 'FC':
             self.field = np.array(schedule.get('start_field', self.field))
+            try:
+                self.df = (np.array(schedule['end_field']) -
+                           self.field) / self.steps
+            except KeyError:
+                # if end_field is not specified, then the field is not changed
+                pass
         elif self.schedule_type in ['ZFC', 'HFC']:
             if 'end_field' not in schedule:
                 raise KeyError('end_field not specified.')
@@ -109,6 +121,8 @@ class MCDriver:
             if self.schedule_type == 'ZFC':
                 self.field = np.array([0.0, 0.0, 0.0])
             if self.schedule_type == 'HFC':
+                if 'start_field' not in schedule:
+                    raise KeyError('start_field not specified.')
                 self.field = np.array(schedule.get('start_field', self.field))
             self.df = (
                 np.array(schedule['end_field']) - self.field) / self.steps
@@ -164,9 +178,14 @@ class MCDriver:
             # create a folder with the schedule name
             os.makedirs(self.schedule_name, exist_ok=True)
 
-        for i in range(self.steps + 1):
+        for i in range(self.steps):
             print(
                 f'Step: {i}, Temperature: {round(self.temperature, 2)}K, Field: {round(self.field[2], 2)} A/m')
+            print(
+                f"Bloch point: {df.tools.count_bps(self.grid.system.m, direction='x')}")
+            print(
+                f"Average Magnetisation: {self.grid.average_magnetisation('all')}")
+
             if self.energy_calc == 'numpy':
                 self.grid.grid = driver_numpy(
                     N, self.grid, self.field, self.temperature)
@@ -175,6 +194,7 @@ class MCDriver:
                                               self.grid.exchange_A, self.grid.dmi_D, str(self.grid.Dtype), self.grid.Ms, self.grid.dx, self.grid.dy, self.grid.dz, self.temperature)
 
             self.grid.system.m.array = self.grid.grid
+
             if save:
                 self._save_state(i)
             self.temperature += self.dt
@@ -185,7 +205,7 @@ class MCDriver:
     def _save_state(self, step: int) -> None:
         """Saves the state/plot of the system. Based on direction flags provided in MCDriver.driver() function,
             the state is saved in the specified planes. The state is saved in a file with the following format:
-            S_{step}_T_{temperature}_F_{field}.png
+            S_{step}_T_{temperature}_F_{field}_{direction}.png
 
         Args:
             step (int): The step number.
@@ -208,8 +228,8 @@ class MCDriver:
 class Grid:
     def __init__(self, system: mm.System) -> None:
         """Grid object required by mcpy for micromagnetic simulations. This class contains all the parameters used by the MCDriver.  
-        Created by abstracting and converting the required parameters from a micromagneticmodel.System object. This normalises the grid and creates the DMI array based on regions.
-        and converts other parameters to numpy arrays.
+           Created by abstracting and converting the required parameters from a micromagneticmodel.System object. This normalises 
+           the grid and creates the DMI array based on regions and converts other parameters to numpy arrays.
 
         Args:
             system (micromagneticmodel.System): The system to be initialized.
@@ -239,9 +259,9 @@ class Grid:
             system.m.mesh.cell, dtype='float64')
         self.zeeman_H = self._get_attribute(system.energy, 'zeeman.H')
         self.exchange_A = self._get_attribute(system.energy, 'exchange.A')
-        self.dmi_D = self._initialize_dmi(system.energy.dmi)
+        self.dmi_D = self._initialise_dmi(system.energy)
         self.Dtype = self._get_attribute(system.energy, 'dmi.crystalclass')
-        self.anisotropy_K, self.anisotropy_u = self._initialize_anisotropy(
+        self.anisotropy_K, self.anisotropy_u = self._initialise_anisotropy(
             system.energy)
         self.demag_N = self._get_attribute(system.energy, 'demag.N')
 
@@ -295,10 +315,9 @@ class Grid:
             print(f'{attribute} found.')
             return attri
         except AttributeError:
-            print(f'{attribute} not found.')
             return default
 
-    def _initialize_dmi(self, dmi) -> np.ndarray:
+    def _initialise_dmi(self, energy) -> np.ndarray:
         """Creates the DMI array based on regions. This currently supports subregions along z-axis only.
 
         If the DMI is a float, then the array is filled with that value.
@@ -306,14 +325,14 @@ class Grid:
         The array is padded with zeros for boundary conditions.
 
         Args:
-            dmi (float or dict): The DMI value(s) to be used.
+            energy (micromagneticmodel.Energy): The Energy object to get the DMI from.
 
         Returns:
             dmi_D (np.ndarray): The DMI array.
         """
         try:
-            if isinstance(dmi.D, float):
-                dmi_D = np.ones(self.grid.shape[:3]) * dmi.D
+            if isinstance(energy.dmi.D, float):
+                dmi_D = np.ones(self.grid.shape[:3]) * energy.dmi.D
                 # padding to avoid boundary conditions
                 dmi_D = np.pad(dmi_D, ((1, 1), (1, 1), (1, 1)), mode='edge')
             else:
@@ -331,10 +350,9 @@ class Grid:
             return dmi_D
 
         except AttributeError:
-            print('DMI not found.')
             return None
 
-    def _initialize_anisotropy(self, energy) -> tuple:
+    def _initialise_anisotropy(self, energy) -> tuple:
         """Initializes the anisotropic energy terms.
 
         Args:
@@ -350,8 +368,60 @@ class Grid:
             return uan_K, uan_u
 
         except AttributeError:
-            print('Anisotropy not found.')
             return None, None
+
+    def emergent_field(self) -> np.ndarray:
+        pass
+
+    def topological_charge(self, method: str = 'luis') -> float:
+        pass
+
+    def topological_charge_bp(self) -> tuple:
+        """Computes the convolution of divergence of emergent magnetic field of the system.
+
+        Returns:
+            x_dir (np.ndarray): The x-direction of the system.
+            bp_charge (np.ndarray): The topological charge density along x direction of the system.
+        """
+
+        F_div = df.tools.emergent_magnetic_field(self.system.m.orientation).div
+        F_int = df.integral(
+            F_div * df.dV, direction='yz').integral(direction='x', improper=True)
+        bp_charge = (F_int / (4*np.pi)).array.squeeze()
+        start = self.system.m.mesh.subregions['r1'].p1[0]
+        end = self.system.m.mesh.subregions['r1'].p2[0]
+        dx = self.system.m.mesh.cell[0]
+        x_dir = np.arange(start, end, dx)
+
+        return x_dir, bp_charge
+
+    def average_magnetisation(self, direction: str = 'z') -> np.ndarray:
+        """Computes the average magnetisation in the given direction. Directions can be 'x', 'y' or 'z' or 'all'.
+
+        Args:
+            direction (str, optional): The direction to compute the average magnetisation. Defaults to 'z'.
+
+        Returns:
+            average_magnetisation (np.ndarray): The average magnetisation in the given direction.
+        """
+        # calculating all the non-zero vectors
+        zeros = np.all(self.grid == [0.0, 0.0, 0.0], axis=-1)
+        non_zeros = np.sum(~zeros)
+        magnetisation = np.sum(self.grid, axis=(0, 1, 2))
+        avg_magnetisation = magnetisation/non_zeros
+
+        if direction == 'all':
+            return avg_magnetisation
+        else:
+            if direction == 'x':
+                return avg_magnetisation[0]
+            elif direction == 'y':
+                return avg_magnetisation[1]
+            elif direction == 'z':
+                return avg_magnetisation[2]
+
+    def energy_density(self) -> np.ndarray:
+        pass
 
     def zeeman_energy(self) -> float:
         """Computes the Zeeman energy
@@ -385,7 +455,7 @@ class Grid:
         Returns:
             energy (float): Total energy of the system
         """
-        return self.zeeeman_energy() + self.anisotropy_energy() + self.exchange_energy() + self.dmi_energy()
+        return self.zeeman_energy() + self.anisotropy_energy() + self.exchange_energy() + self.dmi_energy()
 
     def plot(self, direction: str = 'z') -> None:
         """Plots the magnetisation of the system in the given direction. Directions can be 'x', 'y' or 'z'.

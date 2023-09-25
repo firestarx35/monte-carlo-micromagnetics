@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>mcpy.energies package &#8212; McPy 1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="mcpy-energies-package">
+<h1>mcpy.energies package<a class="headerlink" href="#mcpy-energies-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-mcpy.energies.numba_energies">
+<span id="mcpy-energies-numba-energies-module"></span><h2>mcpy.energies.numba_energies module<a class="headerlink" href="#module-mcpy.energies.numba_energies" title="Link to this heading">¶</a></h2>
+<p>This module contains the numba optimised functions for the energy terms, change in energy calculations and implementions
+for specific cases encountered during my thesis. The functions are called in the numba compiled total energy function in mcpyEnergies
+umba_energies.py</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.anisotropy_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">anisotropy_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.anisotropy_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the anisotropy energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>anisotropy_K</strong> (<em>np.float64</em>) – Anisotropy constant</p></li>
+<li><p><strong>anisotropy_u</strong> (<em>np.array</em>) – Anisotropy axis</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Anisotropy energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.delta_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">delta_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmi_D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.delta_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the energy difference between the current state and the proposed state. Uses ‘Conv_z’ point group for DMI energy calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>spins</strong> (<em>np.array</em>) – (Previous and proposed) spin configuration</p></li>
+<li><p><strong>Ms</strong> (<em>float</em>) – Saturation magnetisation</p></li>
+<li><p><strong>zeeman_H</strong> (<em>np.array</em>) – Zeeman field</p></li>
+<li><p><strong>exchange_A</strong> (<em>np.float64</em>) – Exchange constant</p></li>
+<li><p><strong>anisotropy_K</strong> (<em>np.float64</em>) – Anisotropy constant</p></li>
+<li><p><strong>anisotropy_u</strong> (<em>np.array</em>) – Anisotropy axis</p></li>
+<li><p><strong>dmi_D</strong> (<em>np.array</em>) – DMI constant</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Energy difference between the current state and the proposed state</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.delta_energy2">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">delta_energy2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_ex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dmi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmi_D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.delta_energy2" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculate the energy difference between the current state and the proposed state. Uses ‘T or O’ point group for DMI energy calculation.</dt><dd><p>For Bloch point simulations</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_ex</strong> (<em>np.ndarray</em>) – 5x5x5 grid for exchange with neumann boundary conditions</p></li>
+<li><p><strong>grid_dmi</strong> (<em>np.ndarray</em>) – 5x5x5 grid for DMI with dirichlet boundary conditions</p></li>
+<li><p><strong>spins</strong> (<em>np.ndarray</em>) – (Previous and proposed) spin configuration</p></li>
+<li><p><strong>Ms</strong> (<em>np.float64</em>) – Saturation magnetisation</p></li>
+<li><p><strong>zeeman_H</strong> (<em>np.ndarray</em>) – Zeeman field</p></li>
+<li><p><strong>exchange_A</strong> (<em>np.float64</em>) – Exchange constant</p></li>
+<li><p><strong>anisotropy_K</strong> (<em>np.float64</em>) – Anisotropy constant</p></li>
+<li><p><strong>anisotropy_u</strong> (<em>np.ndarray</em>) – Anisotropy axis</p></li>
+<li><p><strong>dmi_D</strong> (<em>np.ndarray</em>) – DMI constant</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+<li><p><strong>Returns</strong> – np.float64: Energy difference between the current state and the proposed state</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.dmi_Cnvz">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">dmi_Cnvz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.dmi_Cnvz" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the DMI energy of the system. Uses ‘Cnv_z’ point group for DMI energy calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>D</strong> (<em>np.array</em>) – DMI constant grid</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DMI energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.dmi_D2d_z">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">dmi_D2d_z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.dmi_D2d_z" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the DMI energy of the system. Uses ‘D2d_z’ point group for DMI energy calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>D</strong> (<em>np.array</em>) – DMI constant grid</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DMI energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.dmi_TO">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">dmi_TO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.dmi_TO" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the DMI energy of the system. Uses ‘T or O’ point group for DMI energy calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>D</strong> (<em>np.array</em>) – DMI constant grid</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DMI energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.exchange_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">exchange_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.exchange_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the exchange energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>exchange_A</strong> (<em>np.float64</em>) – Exchange constant</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exchange energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exchange_energy</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">-96.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.numba_delta">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">numba_delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_ex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dmi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dmi_D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.numba_delta" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the change in energy between the current state and the proposed state. Uses numba compiled functions for energy calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_ex</strong> (<em>np.ndarray</em>) – 5x5x5 grid for exchange with neumann boundary conditions</p></li>
+<li><p><strong>grid_dmi</strong> (<em>np.ndarray</em>) – 5x5x5 grid for DMI with dirichlet boundary conditions</p></li>
+<li><p><strong>spins</strong> (<em>np.ndarray</em>) – (Previous and proposed) spin configuration</p></li>
+<li><p><strong>Ms</strong> (<em>float</em>) – Saturation magnetisation</p></li>
+<li><p><strong>zeeman_H</strong> (<em>np.ndarray</em>) – Zeeman field</p></li>
+<li><p><strong>exchange_A</strong> (<em>np.float64</em>) – Exchange constant</p></li>
+<li><p><strong>anisotropy_K</strong> (<em>np.float64</em>) – Anisotropy constant</p></li>
+<li><p><strong>anisotropy_u</strong> (<em>np.ndarray</em>) – Anisotropy axis</p></li>
+<li><p><strong>dmi_D</strong> (<em>np.ndarray</em>) – DMI constant</p></li>
+<li><p><strong>Dtype</strong> (<em>str</em>) – DMI type or Crystal class</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Change in energy between the current state and the proposed state</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numba_energies.zeeman_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numba_energies.</span></span><span class="sig-name descname"><span class="pre">zeeman_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numba_energies.zeeman_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the Zeeman energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.array</em>) – 3D vector field</p></li>
+<li><p><strong>zeeman_H</strong> (<em>np.array</em>) – Zeeman field</p></li>
+<li><p><strong>Ms</strong> (<em>np.float64</em>) – Saturation magnetisation</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – x discretisation of the grid</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – y discretisation of the grid</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – z discretisation of the grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Zeeman energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mcpy.energies.numpy_energies">
+<span id="mcpy-energies-numpy-energies-module"></span><h2>mcpy.energies.numpy_energies module<a class="headerlink" href="#module-mcpy.energies.numpy_energies" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numpy_energies.anisotropy_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numpy_energies.</span></span><span class="sig-name descname"><span class="pre">anisotropy_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_K</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_u</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numpy_energies.anisotropy_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the anisotropy energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.ndarray</em>) – 3D array of spins</p></li>
+<li><p><strong>anisotropy_K</strong> (<em>np.float64</em>) – Anisotropy constant</p></li>
+<li><p><strong>anisotropy_u</strong> (<em>np.ndarray</em>) – Anisotropy axis</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – Grid spacing in x direction</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – Grid spacing in y direction</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – Grid spacing in z direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Anisotropy energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>energy (np.float64)</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anisotropy_K</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anisotropy_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anisotropy_energy</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">anisotropy_K</span><span class="p">,</span> <span class="n">anisotropy_u</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numpy_energies.dmi_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numpy_energies.</span></span><span class="sig-name descname"><span class="pre">dmi_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numpy_energies.dmi_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the DMI energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.ndarray</em>) – 3D array of spins</p></li>
+<li><p><strong>Dtype</strong> (<em>str</em>) – DMI type or Crystal class</p></li>
+<li><p><strong>D</strong> (<em>np.ndarray</em>) – DMI constant for the segmented 5x5x5 grid</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – Grid spacing in x direction</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – Grid spacing in y direction</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – Grid spacing in z direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DMI energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>energy (np.float64)</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Dtype</span> <span class="o">=</span> <span class="s1">&#39;D2d_z&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmi_energy</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numpy_energies.exchange_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numpy_energies.</span></span><span class="sig-name descname"><span class="pre">exchange_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exchange_A</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numpy_energies.exchange_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the exchange energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.ndarray</em>) – 3D array of spins</p></li>
+<li><p><strong>exchange_A</strong> (<em>np.float64</em>) – Exchange constant</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – Grid spacing in x direction</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – Grid spacing in y direction</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – Grid spacing in z direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exchange energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>energy (np.float64)</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exchange_A</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">exchange_energy</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">exchange_A</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+<span class="go">-500.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numpy_energies.numpy_delta">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numpy_energies.</span></span><span class="sig-name descname"><span class="pre">numpy_delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_ex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dmi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numpy_energies.numpy_delta" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the change in energy of the system using numpy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<a class="reference internal" href="mcpy.html#mcpy.system.Grid" title="mcpy.system.Grid"><em>Grid</em></a>) – Grid object</p></li>
+<li><p><strong>spins</strong> (<em>np.ndarray</em>) – Array of spins</p></li>
+<li><p><strong>grid_ex</strong> (<em>np.ndarray</em>) – Exchange grid</p></li>
+<li><p><strong>grid_dmi</strong> (<em>np.ndarray</em>) – DMI grid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Change in energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>delta (np.float64)</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid_ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid_dmi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zeeman_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numpy_delta</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">spins</span><span class="p">,</span> <span class="n">grid_ex</span><span class="p">,</span> <span class="n">grid_dmi</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">zeeman_H</span><span class="p">)</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mcpy.energies.numpy_energies.zeeman_energy">
+<span class="sig-prename descclassname"><span class="pre">mcpy.energies.numpy_energies.</span></span><span class="sig-name descname"><span class="pre">zeeman_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeeman_H</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float64</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float64</span></span></span><a class="headerlink" href="#mcpy.energies.numpy_energies.zeeman_energy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the Zeeman energy of the system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<em>np.ndarray</em>) – 3D array of spins</p></li>
+<li><p><strong>zeeman_H</strong> (<em>np.ndarray</em>) – External magnetic field</p></li>
+<li><p><strong>Ms</strong> (<em>np.float64</em>) – Saturation magnetisation</p></li>
+<li><p><strong>dx</strong> (<em>np.float64</em>) – Grid spacing in x direction</p></li>
+<li><p><strong>dy</strong> (<em>np.float64</em>) – Grid spacing in y direction</p></li>
+<li><p><strong>dz</strong> (<em>np.float64</em>) – Grid spacing in z direction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Zeeman energy of the system</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>energy (np.float64)</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zeeman_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ms</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">zeeman_energy</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">zeeman_H</span><span class="p">,</span> <span class="n">Ms</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+<span class="go">-500.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-mcpy.energies.pt_energies">
+<span id="mcpy-energies-pt-energies-module"></span><h2>mcpy.energies.pt_energies module<a class="headerlink" href="#module-mcpy.energies.pt_energies" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-mcpy.energies">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mcpy.energies" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">McPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, M Gulam Nabi.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/mcpy.energies.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

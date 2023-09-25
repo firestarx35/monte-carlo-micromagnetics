@@ -1,4 +1,5 @@
 import numpy as np
+# from mcpy.system import Grid
 
 """ This module contains numpy functions for the energy terms and energy change calculations. """
 
@@ -6,19 +7,19 @@ import numpy as np
 M_0 = 4*np.pi*1e-7  # Magnetic permeability of free space
 
 
-def zeeman_energy(grid, zeeman_H, Ms, dx, dy, dz):
+def zeeman_energy(grid: np.ndarray, zeeman_H: np.ndarray, Ms: np.float64, dx: np.float64, dy: np.float64, dz: np.float64) -> np.float64:
     """Calculates the Zeeman energy of the system
 
     Args:
         grid (np.ndarray): 3D array of spins
-        zeeman_H (np.ndarray): Zeeman field
-        Ms (float): Saturation magnetisation
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
+        zeeman_H (np.ndarray): External magnetic field
+        Ms (np.float64): Saturation magnetisation
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
 
     Returns:
-        energy (float): Zeeman energy of the system
+        energy (np.float64): Zeeman energy of the system
 
     >>> grid = np.ones((5, 5, 5, 3))
     >>> zeeman_H = np.array([0, 0, 1])
@@ -35,19 +36,19 @@ def zeeman_energy(grid, zeeman_H, Ms, dx, dy, dz):
     return energy
 
 
-def anisotropy_energy(grid, anisotropy_K, anisotropy_u, dx, dy, dz):
+def anisotropy_energy(grid: np.ndarray, anisotropy_K: np.float64, anisotropy_u: np.ndarray, dx: np.float64, dy: np.float64, dz: np.float64) -> np.float64:
     """Calculates the anisotropy energy of the system
 
     Args:
         grid (np.ndarray): 3D array of spins
-        anisotropy_K (np.ndarray): Anisotropy constant
+        anisotropy_K (np.float64): Anisotropy constant
         anisotropy_u (np.ndarray): Anisotropy axis
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
 
     Returns:
-        energy (float): Anisotropy energy of the system
+        energy (np.float64): Anisotropy energy of the system
 
     >>> grid = np.ones((5, 5, 5, 3))
     >>> anisotropy_K = 1
@@ -65,18 +66,18 @@ def anisotropy_energy(grid, anisotropy_K, anisotropy_u, dx, dy, dz):
     return energy
 
 
-def exchange_energy(grid, exchange_A, dx, dy, dz):
+def exchange_energy(grid: np.ndarray, exchange_A: np.float64, dx: np.float64, dy: np.float64, dz: np.float64) -> np.float64:
     """Calculates the exchange energy of the system
 
     Args:
         grid (np.ndarray): 3D array of spins
-        exchange_A (np.ndarray): Exchange constant
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
+        exchange_A (np.float64): Exchange constant
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
 
     Returns:
-        energy (float): Exchange energy of the system
+        energy (np.float64): Exchange energy of the system
 
     >>> grid = np.ones((5, 5, 5, 3))
     >>> exchange_A = 1
@@ -102,19 +103,19 @@ def exchange_energy(grid, exchange_A, dx, dy, dz):
     return energy
 
 
-def dmi_energy(grid, Dtype, D, dx, dy, dz):
+def dmi_energy(grid: np.ndarray, Dtype: str, D: np.ndarray, dx: np.float64, dy: np.float64, dz: np.float64) -> np.float64:
     """Calculates the DMI energy of the system
 
     Args:
         grid (np.ndarray): 3D array of spins
-        Dtype (str): Type of DMI or Crystal class
+        Dtype (str): DMI type or Crystal class
         D (np.ndarray): DMI constant for the segmented 5x5x5 grid
-        dx (float): Grid spacing in x direction
-        dy (float): Grid spacing in y direction
-        dz (float): Grid spacing in z direction
+        dx (np.float64): Grid spacing in x direction
+        dy (np.float64): Grid spacing in y direction
+        dz (np.float64): Grid spacing in z direction
 
     Returns:
-        energy (float): DMI energy of the system
+        energy (np.float64): DMI energy of the system
 
     >>> grid = np.ones((5, 5, 5, 3))
     >>> Dtype = 'D2d_z'
@@ -178,7 +179,7 @@ def dmi_energy(grid, Dtype, D, dx, dy, dz):
         res = cross_x - cross_y
 
         # Total energy
-        energy = np.sum(D*pgrid[1:-1, 1:-1, 1:-1]*res)*dx * \
+        energy = np.sum(D*np.sum(pgrid[1:-1, 1:-1, 1:-1]*res, axis=-1))*dx * \
             dy*dz  # total energy of the system
 
     elif type == 'Cnv_xy':
@@ -205,19 +206,18 @@ def dmi_energy(grid, Dtype, D, dx, dy, dz):
     return energy
 
 
-def numpy_delta(grid, spins, grid_ex, grid_dmi, D, zeeman_H):
+def numpy_delta(grid, spins: np.ndarray, grid_ex: np.ndarray, grid_dmi: np.ndarray, D: np.ndarray, zeeman_H: np.ndarray) -> np.float64:
     """Calculates the change in energy of the system using numpy
 
     Args:
-        grid (mcpy.Grid): mcpy.Grid object
-        spins (np.ndarray): Original and proposed spin
-        grid_ex (np.ndarray): 5x5x5 grid for exchange with neumann boundary conditions
-        grid_dmi (np.ndarray): 5x5x5 grid for DMI with dirichlet boundary conditions
-        D (np.ndarray): DMI constant for the segmented 5x5x5 grid
-        zeeman_H (np.ndarray): External magnetic field
+        grid (Grid): Grid object
+        spins (np.ndarray): Array of spins
+        grid_ex (np.ndarray): Exchange grid
+        grid_dmi (np.ndarray): DMI grid
 
     Returns:
-        delta (float): Change in energy
+        delta (np.float64): Change in energy of the system
+
 
     >>> grid = np.ones((5, 5, 5, 3))
     >>> spins = np.array([[1, 0, 0], [0, 1, 0]])
